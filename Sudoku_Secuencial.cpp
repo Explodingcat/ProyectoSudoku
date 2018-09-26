@@ -508,19 +508,20 @@ void buscar_Solucion(int tableroaux[][9], int posibles[][9][9], int fila,int col
 {
 	int cont=0;
 	int tablero[9][9];
-	for(int i=0;i<9;i++)
-	{
-		for(int j=0;j<9;j++)
-		{
-			tablero[i][j]=tableroaux[i][j];
-		}
-	}
 	if(columna>8 && (fila+1)>8)
 	{
-		ver_Matriz(tablero);
+		mostrar_Matriz(tableroaux);
 	}
 	else
 	{
+		for(int i=0;i<9;i++)
+		{
+			for(int j=0;j<9;j++)
+			{
+				tablero[i][j]=tableroaux[i][j];
+			}
+		}
+
 		if(columna>8)
 		{
 			fila++;
@@ -531,12 +532,9 @@ void buscar_Solucion(int tableroaux[][9], int posibles[][9][9], int fila,int col
 
 			for(int j=columna;j<9;j++)
 			{
-				if(tablero[i][j]!=0)
+				if(tablero[i][j]==0)
 				{
-				}
-				else
-				{
-					while(posibles[i][j][cont]!=0)
+					while(posibles[i][j][cont]!=0 && cont<9)
 					{
 						if(RevisarColumna(j,posibles[i][j][cont],tablero)==1 && RevisarFila(i,posibles[i][j][cont],tablero)==1)
 						{
@@ -636,16 +634,23 @@ void buscar_Solucion(int tableroaux[][9], int posibles[][9][9], int fila,int col
 						}
 
 						cont++;
-						for(int i=0;i<9;i++)
+						for(int f=0;f<9;f++)
 						{
-							for(int j=0;j<9;j++)
+							for(int d=0;d<9;d++)
 							{
-								tablero[i][j]=tableroaux[i][j];
+								tablero[f][d]=tableroaux[f][d];
 							}
 						}
 					}
 					i=9;
 					j=9;
+				}
+				else
+				{
+					if(i==8 && j==8)
+					{
+						mostrar_Matriz(tablero);
+					}
 				}
 			}
 			columna=0;
@@ -656,9 +661,31 @@ void buscar_Solucion(int tableroaux[][9], int posibles[][9][9], int fila,int col
 void resolver_Sudoku(int tablero[][9],int posibles[][9][9])
 {
 	int tableroaux[9][9];
+	int t,y,mayor=0,conta=0;
 	for(int i=0;i<9;i++)
 	{
-		if(posibles[0][0][i]!=0)
+		for(int j=0;j<9;j++)
+		{
+			for(int p=0;p<9;p++)
+			{
+				if(posibles[i][j][p]!=0)
+				{
+					conta++;
+				}
+			}
+			if(conta>mayor)
+			{
+				t=i;
+				y=j;
+				mayor=conta;
+			}
+			conta=0;
+		}
+	}
+
+	for(int i=0;i<9;i++)
+	{
+		if(posibles[t][y][i]!=0)
 		{
 			for(int i=0;i<9;i++)
 			{
@@ -667,9 +694,9 @@ void resolver_Sudoku(int tablero[][9],int posibles[][9][9])
 					tableroaux[i][j]=tablero[i][j];
 				}
 			}
-			tableroaux[0][0]=posibles[0][0][i];
-			//cout<<".......................................................................INICIAL CON "<<posibles[0][0][i]<<endl;
-			buscar_Solucion(tableroaux,posibles,0,1);
+			tableroaux[t][y]=posibles[t][y][i];
+			//cout<<".......................................................................INICIAL CON "<<posibles[t][y][i]<<endl;
+			buscar_Solucion(tableroaux,posibles,0,0);
 		}
 	}
 }
