@@ -16,6 +16,7 @@ paralelo:
 mpirun -np "numero procesadores" ./"nombre_ejecutable" "sudoku_ejemplo"
 
 secuencial:
+
 ./"nombre_ejecutable" "sudoku_ejemplo"
 
 NORMAL 2
