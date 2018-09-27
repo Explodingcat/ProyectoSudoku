@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iostream>
-
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -43,7 +44,7 @@ void llenar_Matriz(int tablero[][9], char *datos,int posibles[][9][9])
 
 int comprobar_Datos(char *datos)
 {
-    int dato=1,hola,chao=0,numeros[3],cont=-1;
+    int dato=1,hola,chao=0,numeros[3],cont=-1,conta=0;
     char s;
     string cadena=datos;
     for(int i=0;i<cadena.length();i++)
@@ -58,6 +59,7 @@ int comprobar_Datos(char *datos)
                 dato=0;
             }
             chao=hola;
+
          }
          else
          {
@@ -75,6 +77,7 @@ int comprobar_Datos(char *datos)
              hola=s;
              if(hola>47 && hola<58)
              {
+             	 conta++;
                  numeros[++cont]=hola-48;
              }
              if(cont==2)
@@ -93,29 +96,12 @@ int comprobar_Datos(char *datos)
      
         }
      }
+     if((conta/3)<13)
+     	dato=0;
+
      return dato;
 }
 
-void mostrar_Matriz(int tablero[][9])
-{
-    for(int i=0;i<9;i++)
-    {
-        if(i%3==0)
-        {
-            cout<<"--------------------"<<endl;
-        }
-        for(int j=0;j<9;j++)
-        {
-            if(j%3==0)
-            {
-                cout<<"|";
-            }
-            cout<<tablero[i][j]<<" ";
-
-        }
-        cout<<endl;
-    }
-}
 
 int RevisarFila(int fila, int valor, int tablero[][9])
 {
@@ -484,33 +470,24 @@ void buscar_Opciones(int tablero[][9], int posibles[][9][9])
 		}
 	}
 }
-void ver_Matriz(int tablero[][9])
-{
-	int ver=0;
-	for(int i=0;i<9;i++)
-	{
-		for(int j=0;j<9;j++)
-		{
-			if(tablero[i][j]==0)
-			{
-				ver=1;
-				i=9;
-				j=9;
-			}
-		}
-	}
-	if(ver==0)
-	{
-		mostrar_Matriz(tablero);
-	}
-}
+
 void buscar_Solucion(int tableroaux[][9], int posibles[][9][9], int fila,int columna)
 {
 	int cont=0;
 	int tablero[9][9];
 	if(columna>8 && (fila+1)>8)
 	{
-		mostrar_Matriz(tableroaux);
+		ofstream myfile;
+      	myfile.open ("solucion_sudoku.csv");
+      	for(int i=0;i<9;i++)
+      	{
+      		for(int j=0;j<9;j++)
+      		{
+      			myfile<<tableroaux[i][j]<<";";
+      		}
+      	}
+      	myfile.close();
+      	//exit(0);
 	}
 	else
 	{
@@ -638,6 +615,7 @@ void buscar_Solucion(int tableroaux[][9], int posibles[][9][9], int fila,int col
 						{
 							for(int d=0;d<9;d++)
 							{
+
 								tablero[f][d]=tableroaux[f][d];
 							}
 						}
@@ -649,7 +627,17 @@ void buscar_Solucion(int tableroaux[][9], int posibles[][9][9], int fila,int col
 				{
 					if(i==8 && j==8)
 					{
-						mostrar_Matriz(tablero);
+						ofstream myfile;
+						myfile.open ("solucion_sudoku.csv");
+						for(int i=0;i<9;i++)
+						{
+				      		for(int j=0;j<9;j++)
+				      		{
+				      			myfile<<tableroaux[i][j]<<";";
+						     }
+						}
+				      	myfile.close();
+				      	//exit(0);
 					}
 				}
 			}
@@ -687,31 +675,16 @@ void resolver_Sudoku(int tablero[][9],int posibles[][9][9])
 	{
 		if(posibles[t][y][i]!=0)
 		{
-			for(int i=0;i<9;i++)
+			for(int k=0;k<9;k++) //REVISAR EL INDICE I__________________________________________________________________________________________________
 			{
 				for(int j=0;j<9;j++)
 				{
-					tableroaux[i][j]=tablero[i][j];
+					tableroaux[k][j]=tablero[k][j];
 				}
 			}
 			tableroaux[t][y]=posibles[t][y][i];
 			//cout<<".......................................................................INICIAL CON "<<posibles[t][y][i]<<endl;
 			buscar_Solucion(tableroaux,posibles,0,0);
-		}
-	}
-}
-
-void mostrar_Posibles(int posibles[][9][9])
-{
-	for(int i=0;i<9;i++)
-	{
-		for(int j=0;j<9;j++)
-		{
-			for(int p=0;p<9;p++)
-			{
-				cout<<posibles[i][j][p];
-			}
-			cout<<endl;
 		}
 	}
 }
@@ -729,7 +702,6 @@ int main(int argc, char* argv[])
         if(comprobar_Datos(argv[1])==1)
         {
             llenar_Matriz(tablero,argv[1],posibles);
-            mostrar_Matriz(tablero);
             buscar_Opciones(tablero,posibles);
             cout<<endl;
             resolver_Sudoku(tablero,posibles);
