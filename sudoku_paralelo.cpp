@@ -744,60 +744,70 @@ int main(int argc, char* argv[])
   	MPI_Init(&argc,&argv);
   	MPI_Comm_size(MPI_COMM_WORLD, &tamano); 
   	MPI_Comm_rank(MPI_COMM_WORLD, &procesador);
-  	if(procesador==0)
+  	if(tamano>1)
   	{
-	    if(argc<2)
-	    {
-	    	verif=0;
-	    	for(int i=1;i<tamano;i++)
-	    	{
-	    		MPI_Send(&verif, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-	    	}
-	        cout<<"Ingresa los datos"<<endl;
-	    }
-	    else
-	    {
-	        if(comprobar_Datos(argv[1])==1)
-	        {
-	        	verif=1;
-	        	for(int i=1;i<tamano;i++)
+	  	if(procesador==0)
+	  	{
+		    if(argc<2)
+		    {
+		    	verif=0;
+		    	for(int i=1;i<tamano;i++)
 		    	{
-					MPI_Send(&verif, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+		    		MPI_Send(&verif, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
 		    	}
+		        cout<<"Ingresa los datos"<<endl;
+		    }
+		    else
+		    {
+		        if(comprobar_Datos(argv[1])==1)
+		        {
+		        	verif=1;
+		        	for(int i=1;i<tamano;i++)
+			    	{
+						MPI_Send(&verif, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+			    	}
 
-	            llenar_Matriz(tablero,argv[1],posibles);
-	            buscar_Opciones(tablero,posibles);
-	            resolver_Sudoku(tablero,posibles,tamano);
-	            
-	        }
-	        else
-	        {
-	        	verif=0;
-	        	for(int i=1;i<tamano;i++)
-		    	{
-					MPI_Send(&verif, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-		    	}
-	            cout<<"Datos ingresados erroneos"<<endl;
-	        }
-	    }
-	 }
-	 else
-	 {
-	 	MPI_Recv(&verif, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	 	if(verif==1)
-	 	{
-	 		while(verif==1)
-	 		{
-	 			MPI_Recv(&verif, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	 			if(verif==1)
-	 			{
-	 				MPI_Recv(tablero, 81, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	 				MPI_Recv(posibles, 729, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	 				buscar_Solucion(tablero,posibles,0,0);
-	 		 	}
-	 		 }
-	 	}
-	 }
+		            llenar_Matriz(tablero,argv[1],posibles);
+		            buscar_Opciones(tablero,posibles);
+		            resolver_Sudoku(tablero,posibles,tamano);
+		            
+		        }
+		        else
+		        {
+		        	verif=0;
+		        	for(int i=1;i<tamano;i++)
+			    	{
+						MPI_Send(&verif, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+			    	}
+		            cout<<"Datos ingresados erroneos"<<endl;
+		        }
+		    }
+		 }
+		 else
+		 {
+		 	MPI_Recv(&verif, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		 	if(verif==1)
+		 	{
+		 		while(verif==1)
+		 		{
+		 			MPI_Recv(&verif, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		 			if(verif==1)
+		 			{
+		 				MPI_Recv(tablero, 81, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		 				MPI_Recv(posibles, 729, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		 				buscar_Solucion(tablero,posibles,0,0);
+		 		 	}
+		 		 }
+		 	}
+		 }
+	}
+	else
+	{
+		if(procesador==0)
+		{
+			cout<<"Ingrese cantidad de procesadores mayor a 1"<<endl;
+		}
+	}
 
     MPI_Finalize();
 }
